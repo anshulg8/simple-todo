@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -18,30 +18,52 @@ interface Todo {
   isCompleted: boolean;
 }
 
+// Utility functions to interact with localStorage
+const getTodosFromStorage = (): Todo[] => {
+  const storedTodos = localStorage.getItem("todos");
+  return storedTodos ? JSON.parse(storedTodos) : [];
+};
+
+const saveTodosToStorage = (todos: Todo[]) => {
+  localStorage.setItem("todos", JSON.stringify(todos));
+};
+
 const TodoApp: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
 
-  const addTodo = () => {
+  // Load todos from localStorage on component mount
+  useEffect(() => {
+    const storedTodos = getTodosFromStorage();
+    setTodos(storedTodos);
+  }, []);
+
+  const handleAddTodo = () => {
     if (newTodo.trim()) {
-      setTodos([
-        ...todos,
-        { id: Date.now(), text: newTodo, isCompleted: false },
-      ]);
+      const newTodoItem: Todo = {
+        id: Date.now(),
+        text: newTodo,
+        isCompleted: false,
+      };
+      const updatedTodos = [...todos, newTodoItem];
+      setTodos(updatedTodos);
+      saveTodosToStorage(updatedTodos);
       setNewTodo("");
     }
   };
 
-  const removeTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+  const handleRemoveTodo = (id: number) => {
+    const updatedTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(updatedTodos);
+    saveTodosToStorage(updatedTodos);
   };
 
-  const toggleTodo = (id: number) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo
-      )
+  const handleToggleTodo = (id: number) => {
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo
     );
+    setTodos(updatedTodos);
+    saveTodosToStorage(updatedTodos);
   };
 
   return (
@@ -55,7 +77,7 @@ const TodoApp: React.FC = () => {
           value={newTodo}
           onChange={(e) => setNewTodo(e.target.value)}
         />
-        <Button colorScheme="teal" onClick={addTodo}>
+        <Button colorScheme="teal" onClick={handleAddTodo}>
           Add
         </Button>
       </HStack>
@@ -67,7 +89,7 @@ const TodoApp: React.FC = () => {
                 <HStack>
                   <Checkbox
                     isChecked={todo.isCompleted}
-                    onChange={() => toggleTodo(todo.id)}
+                    onChange={() => handleToggleTodo(todo.id)}
                   />
                   <Text
                     as={todo.isCompleted ? "s" : undefined}
@@ -79,7 +101,7 @@ const TodoApp: React.FC = () => {
                 <Button
                   size="sm"
                   colorScheme="red"
-                  onClick={() => removeTodo(todo.id)}
+                  onClick={() => handleRemoveTodo(todo.id)}
                 >
                   Remove
                 </Button>
