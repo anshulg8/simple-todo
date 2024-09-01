@@ -1,50 +1,19 @@
-# React + TypeScript + Vite
+# Simple ToDo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![GitHub repo size](https://img.shields.io/github/repo-size/anshulg8/simple-todo)
+![GitHub stars](https://img.shields.io/github/stars/anshulg8/simple-todo?style=social)
+![GitHub forks](https://img.shields.io/github/forks/anshulg8/simple-todo?style=social)
+![GitHub issues](https://img.shields.io/github/issues/anshulg8/simple-todo)
+![GitHub license](https://img.shields.io/github/license/anshulg8/simple-todo)
 
-Currently, two official plugins are available:
+A simple React-based ToDo app that has option to import & export tasks. The data is stored safely in browser's local storage and never leave the device.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Demo
 
-## Expanding the ESLint configuration
+Check out the live demo [here](https://anshulg8.github.io/simple-todo).
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Technologies Used
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- **React:** A JavaScript library for building user interfaces.
+- **Chakra UI:** A simple, modular, and accessible component library for React.
+- **TypeScript:** For type safety and improved development experience.
