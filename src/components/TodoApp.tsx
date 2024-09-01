@@ -6,16 +6,19 @@ import {
   Container,
   Heading,
   HStack,
+  IconButton,
   Input,
   List,
   ListItem,
   Text,
+  Tooltip,
   VStack,
 } from "@chakra-ui/react";
 import Footer from "./Footer";
 import ConfirmationDialog from "./ConfirmationDialog";
 import Confetti from "react-confetti";
 import { Todo } from "../types";
+import { FaTrash, FaFileImport, FaFileExport } from "react-icons/fa";
 
 // Utility functions to interact with localStorage
 const getTodosFromStorage = (): Todo[] => {
@@ -65,7 +68,7 @@ const TodoApp: React.FC = () => {
     // Trigger confetti effect when a task is marked done
     if (updatedTodos.find((todo) => todo.id === id && todo.isCompleted)) {
       setConfetti(true);
-      setTimeout(() => setConfetti(false), 5000);
+      setTimeout(() => setConfetti(false), 3000);
     }
   };
 
@@ -145,9 +148,24 @@ const TodoApp: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <Button colorScheme="blue" onClick={handleExport}>
-            Export
-          </Button>
+          <Tooltip label="Export" aria-label="Export Tasks">
+            <IconButton
+              aria-label="Export Tasks"
+              icon={<FaFileExport />}
+              colorScheme="blue"
+              onClick={handleExport}
+            />
+          </Tooltip>
+
+          <Tooltip label="Import" aria-label="Import Tasks">
+            <IconButton
+              as="label"
+              htmlFor="import-tasks"
+              aria-label="Import Tasks"
+              icon={<FaFileImport />}
+              colorScheme="green"
+            />
+          </Tooltip>
           <Input
             type="file"
             accept=".json"
@@ -155,9 +173,6 @@ const TodoApp: React.FC = () => {
             display="none"
             id="import-tasks"
           />
-          <Button as="label" htmlFor="import-tasks" colorScheme="green">
-            Import
-          </Button>
         </HStack>
         <HStack mb={4}>
           <Input
@@ -176,7 +191,7 @@ const TodoApp: React.FC = () => {
             {filteredTodos.map((todo) => (
               <ListItem key={todo.id}>
                 <HStack justify="space-between">
-                  <HStack>
+                  <HStack flex="1" overflow="hidden">
                     <Checkbox
                       isChecked={todo.isCompleted}
                       onChange={() => handleToggleTodo(todo.id)}
@@ -188,17 +203,19 @@ const TodoApp: React.FC = () => {
                       textDecoration={
                         todo.isCompleted ? "line-through" : "none"
                       }
+                      overflow="hidden"
+                      textOverflow="ellipsis"
                     >
                       {todo.text}
                     </Text>
                   </HStack>
-                  <Button
-                    size="sm"
+                  <IconButton
+                    aria-label="Remove Task"
+                    icon={<FaTrash />}
                     colorScheme="red"
                     onClick={() => openDeleteConfirmation(todo.id)}
-                  >
-                    Remove
-                  </Button>
+                    ml={4}
+                  />
                 </HStack>
               </ListItem>
             ))}
