@@ -30,6 +30,7 @@ const saveTodosToStorage = (todos: Todo[]) => {
 const TodoApp: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [todoToRemove, setTodoToRemove] = useState<number | null>(null);
   const [confetti, setConfetti] = useState(false);
@@ -64,7 +65,7 @@ const TodoApp: React.FC = () => {
     // Trigger confetti effect when a task is marked done
     if (updatedTodos.find((todo) => todo.id === id && todo.isCompleted)) {
       setConfetti(true);
-      setTimeout(() => setConfetti(false), 3000);
+      setTimeout(() => setConfetti(false), 5000);
     }
   };
 
@@ -127,25 +128,25 @@ const TodoApp: React.FC = () => {
     }
   };
 
+  // Filter todos based on search query
+  const filteredTodos = todos.filter((todo) =>
+    todo.text.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <Container maxW="md" mt={8}>
       <Heading mb={6} textAlign="center">
         Todo List
       </Heading>
-      <HStack mb={4}>
-        <Input
-          placeholder="Enter a new task"
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-        />
-        <Button colorScheme="teal" onClick={handleAddTodo}>
-          Add
-        </Button>
-      </HStack>
       <VStack spacing={4} align="stretch">
         <HStack justify="space-between">
+          <Input
+            placeholder="Search tasks"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <Button colorScheme="blue" onClick={handleExport}>
-            Export Tasks
+            Export
           </Button>
           <Input
             type="file"
@@ -155,12 +156,24 @@ const TodoApp: React.FC = () => {
             id="import-tasks"
           />
           <Button as="label" htmlFor="import-tasks" colorScheme="green">
-            Import Tasks
+            Import
           </Button>
         </HStack>
+        <HStack mb={4}>
+          <Input
+            placeholder="Enter a new task"
+            value={newTodo}
+            onChange={(e) => setNewTodo(e.target.value)}
+          />
+          <Button colorScheme="teal" onClick={handleAddTodo}>
+            Add
+          </Button>
+        </HStack>
+      </VStack>
+      <VStack spacing={4} align="stretch">
         <Box borderWidth="1px" borderRadius="lg" p={4}>
           <List spacing={3}>
-            {todos.map((todo) => (
+            {filteredTodos.map((todo) => (
               <ListItem key={todo.id}>
                 <HStack justify="space-between">
                   <HStack>
