@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -10,6 +10,12 @@ import {
   List,
   ListItem,
   Text,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
 } from "@chakra-ui/react";
 
 interface Todo {
@@ -31,6 +37,9 @@ const saveTodosToStorage = (todos: Todo[]) => {
 const TodoApp: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [todoToRemove, setTodoToRemove] = useState<number | null>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
 
   // Load todos from localStorage on component mount
   useEffect(() => {
@@ -52,18 +61,31 @@ const TodoApp: React.FC = () => {
     }
   };
 
-  const handleRemoveTodo = (id: number) => {
-    const updatedTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(updatedTodos);
-    saveTodosToStorage(updatedTodos);
-  };
-
   const handleToggleTodo = (id: number) => {
     const updatedTodos = todos.map((todo) =>
       todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo
     );
     setTodos(updatedTodos);
     saveTodosToStorage(updatedTodos);
+  };
+
+  const openDeleteConfirmation = (id: number) => {
+    setTodoToRemove(id);
+    setIsDialogOpen(true);
+  };
+
+  const closeDeleteConfirmation = () => {
+    setTodoToRemove(null);
+    setIsDialogOpen(false);
+  };
+
+  const confirmRemoveTodo = () => {
+    if (todoToRemove !== null) {
+      const updatedTodos = todos.filter((todo) => todo.id !== todoToRemove);
+      setTodos(updatedTodos);
+      saveTodosToStorage(updatedTodos);
+      closeDeleteConfirmation();
+    }
   };
 
   return (
@@ -92,8 +114,9 @@ const TodoApp: React.FC = () => {
                     onChange={() => handleToggleTodo(todo.id)}
                   />
                   <Text
-                    as={todo.isCompleted ? "s" : undefined}
+                    as={todo.isCompleted ? "span" : undefined}
                     color={todo.isCompleted ? "gray.500" : "black"}
+                    fontWeight={todo.isCompleted ? "normal" : "bold"}
                   >
                     {todo.text}
                   </Text>
@@ -101,7 +124,7 @@ const TodoApp: React.FC = () => {
                 <Button
                   size="sm"
                   colorScheme="red"
-                  onClick={() => handleRemoveTodo(todo.id)}
+                  onClick={() => openDeleteConfirmation(todo.id)}
                 >
                   Remove
                 </Button>
@@ -110,6 +133,39 @@ const TodoApp: React.FC = () => {
           ))}
         </List>
       </Box>
+
+      <AlertDialog
+        isOpen={isDialogOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={closeDeleteConfirmation}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader
+              fontSize="lg"
+              textAlign="center"
+              fontWeight="bold"
+              color={"red.500"}
+            >
+              Delete Todo
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to delete this task? This action cannot be
+              undone.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={closeDeleteConfirmation}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={confirmRemoveTodo} ml={3}>
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Container>
   );
 };
