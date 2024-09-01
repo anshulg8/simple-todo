@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import Footer from "./Footer";
 import ConfirmationDialog from "./ConfirmationDialog";
+import Confetti from "react-confetti";
 import { Todo } from "../types";
 
 // Utility functions to interact with localStorage
@@ -31,6 +32,7 @@ const TodoApp: React.FC = () => {
   const [newTodo, setNewTodo] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [todoToRemove, setTodoToRemove] = useState<number | null>(null);
+  const [confetti, setConfetti] = useState(false);
 
   // Load todos from localStorage on component mount
   useEffect(() => {
@@ -58,6 +60,12 @@ const TodoApp: React.FC = () => {
     );
     setTodos(updatedTodos);
     saveTodosToStorage(updatedTodos);
+
+    // Trigger confetti effect when a task is marked done
+    if (updatedTodos.find((todo) => todo.id === id && todo.isCompleted)) {
+      setConfetti(true);
+      setTimeout(() => setConfetti(false), 3000);
+    }
   };
 
   const openDeleteConfirmation = (id: number) => {
@@ -93,7 +101,7 @@ const TodoApp: React.FC = () => {
     linkElement.click();
   };
 
-  // Import tasks from a JSON file
+  // Import tasks from a JSON file and append to existing tasks
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -102,9 +110,15 @@ const TodoApp: React.FC = () => {
         const content = e.target?.result as string;
         try {
           const importedTodos: Todo[] = JSON.parse(content);
+          // Append the imported tasks to the existing tasks
           const updatedTodos = [...todos, ...importedTodos];
-          setTodos(updatedTodos);
-          saveTodosToStorage(updatedTodos);
+          // Remove duplicate tasks based on the ID
+          const uniqueTodos = updatedTodos.filter(
+            (todo, index, self) =>
+              index === self.findIndex((t) => t.id === todo.id)
+          );
+          setTodos(uniqueTodos);
+          saveTodosToStorage(uniqueTodos);
         } catch (error) {
           console.error("Invalid JSON file", error);
         }
@@ -192,6 +206,8 @@ const TodoApp: React.FC = () => {
       />
 
       <Footer />
+
+      {confetti && <Confetti />}
     </Container>
   );
 };
