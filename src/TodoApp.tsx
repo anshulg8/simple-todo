@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
+  Link,
 } from "@chakra-ui/react";
 
 interface Todo {
@@ -117,6 +118,7 @@ const TodoApp: React.FC = () => {
                     as={todo.isCompleted ? "span" : undefined}
                     color={todo.isCompleted ? "gray.500" : "black"}
                     fontWeight={todo.isCompleted ? "normal" : "bold"}
+                    textDecoration={todo.isCompleted ? "line-through" : "none"}
                   >
                     {todo.text}
                   </Text>
@@ -133,6 +135,10 @@ const TodoApp: React.FC = () => {
           ))}
         </List>
       </Box>
+      <Text mt={4} fontSize="sm" color="gray.500" textAlign="center">
+        Your tasks are stored safely in your browser's local storage and never
+        leave your device.
+      </Text>
 
       <AlertDialog
         isOpen={isDialogOpen}
@@ -166,6 +172,20 @@ const TodoApp: React.FC = () => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+
+      <Box as="footer" mt={8} textAlign="center">
+        <Text fontSize="sm" color="gray.500">
+          Made with ❤️ in 🇮🇳 by{" "}
+          <Link href="https://anshulgarg.in" color="teal.500" isExternal>
+            Anshul Garg
+          </Link>
+          . Check out the code on{" "}
+          <Link href="https://github.com/anshulg8" color="teal.500" isExternal>
+            Github
+          </Link>
+          .
+        </Text>
+      </Box>
     </Container>
   );
 };
