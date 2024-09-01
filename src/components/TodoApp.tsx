@@ -1,4 +1,3 @@
-// src/TodoApp.tsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -11,15 +10,11 @@ import {
   List,
   ListItem,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import Footer from "./Footer";
 import ConfirmationDialog from "./ConfirmationDialog";
-
-interface Todo {
-  id: number;
-  text: string;
-  isCompleted: boolean;
-}
+import { Todo } from "../types";
 
 // Utility functions to interact with localStorage
 const getTodosFromStorage = (): Todo[] => {
@@ -84,6 +79,40 @@ const TodoApp: React.FC = () => {
     }
   };
 
+  // Export tasks to a JSON file
+  const handleExport = () => {
+    const dataStr = JSON.stringify(todos, null, 2);
+    const dataUri =
+      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = `${+new Date()}-tasks.json`;
+
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", exportFileDefaultName);
+    linkElement.click();
+  };
+
+  // Import tasks from a JSON file
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        try {
+          const importedTodos: Todo[] = JSON.parse(content);
+          const updatedTodos = [...todos, ...importedTodos];
+          setTodos(updatedTodos);
+          saveTodosToStorage(updatedTodos);
+        } catch (error) {
+          console.error("Invalid JSON file", error);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
   return (
     <Container maxW="md" mt={8}>
       <Heading mb={6} textAlign="center">
@@ -99,37 +128,56 @@ const TodoApp: React.FC = () => {
           Add
         </Button>
       </HStack>
-      <Box borderWidth="1px" borderRadius="lg" p={4}>
-        <List spacing={3}>
-          {todos.map((todo) => (
-            <ListItem key={todo.id}>
-              <HStack justify="space-between">
-                <HStack>
-                  <Checkbox
-                    isChecked={todo.isCompleted}
-                    onChange={() => handleToggleTodo(todo.id)}
-                  />
-                  <Text
-                    as={todo.isCompleted ? "span" : undefined}
-                    color={todo.isCompleted ? "gray.500" : "black"}
-                    fontWeight={todo.isCompleted ? "normal" : "bold"}
-                    textDecoration={todo.isCompleted ? "line-through" : "none"}
+      <VStack spacing={4} align="stretch">
+        <HStack justify="space-between">
+          <Button colorScheme="blue" onClick={handleExport}>
+            Export Tasks
+          </Button>
+          <Input
+            type="file"
+            accept=".json"
+            onChange={handleImport}
+            display="none"
+            id="import-tasks"
+          />
+          <Button as="label" htmlFor="import-tasks" colorScheme="green">
+            Import Tasks
+          </Button>
+        </HStack>
+        <Box borderWidth="1px" borderRadius="lg" p={4}>
+          <List spacing={3}>
+            {todos.map((todo) => (
+              <ListItem key={todo.id}>
+                <HStack justify="space-between">
+                  <HStack>
+                    <Checkbox
+                      isChecked={todo.isCompleted}
+                      onChange={() => handleToggleTodo(todo.id)}
+                    />
+                    <Text
+                      as={todo.isCompleted ? "span" : undefined}
+                      color={todo.isCompleted ? "gray.500" : "black"}
+                      fontWeight={todo.isCompleted ? "normal" : "bold"}
+                      textDecoration={
+                        todo.isCompleted ? "line-through" : "none"
+                      }
+                    >
+                      {todo.text}
+                    </Text>
+                  </HStack>
+                  <Button
+                    size="sm"
+                    colorScheme="red"
+                    onClick={() => openDeleteConfirmation(todo.id)}
                   >
-                    {todo.text}
-                  </Text>
+                    Remove
+                  </Button>
                 </HStack>
-                <Button
-                  size="sm"
-                  colorScheme="red"
-                  onClick={() => openDeleteConfirmation(todo.id)}
-                >
-                  Remove
-                </Button>
-              </HStack>
-            </ListItem>
-          ))}
-        </List>
-      </Box>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </VStack>
       <Text mt={4} fontSize="sm" color="gray.500" textAlign="center">
         Your tasks are stored safely in your browser's local storage and never
         leave your device.

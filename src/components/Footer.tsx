@@ -8,15 +8,11 @@ const Footer: React.FC = () => {
     <Box as="footer" mt={8} textAlign="center">
       <Text fontSize="sm" color="gray.500">
         Made with ❤️ in 🇮🇳 by{" "}
-        <Link href="https://example.com" color="teal.500" isExternal>
-          Example User
+        <Link href="https://anshulgarg.in" color="teal.500" isExternal>
+          Anshul Garg
         </Link>
         . Check out the code on{" "}
-        <Link
-          href="https://github.com/your-github-repo"
-          color="teal.500"
-          isExternal
-        >
+        <Link href="https://github.com/anshulg8" color="teal.500" isExternal>
           Github
         </Link>
         .
