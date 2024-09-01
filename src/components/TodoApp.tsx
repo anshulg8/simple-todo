@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+// src/TodoApp.tsx
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -10,14 +11,9 @@ import {
   List,
   ListItem,
   Text,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogContent,
-  AlertDialogOverlay,
-  Link,
 } from "@chakra-ui/react";
+import Footer from "./Footer";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 interface Todo {
   id: number;
@@ -40,7 +36,6 @@ const TodoApp: React.FC = () => {
   const [newTodo, setNewTodo] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [todoToRemove, setTodoToRemove] = useState<number | null>(null);
-  const cancelRef = useRef<HTMLButtonElement>(null);
 
   // Load todos from localStorage on component mount
   useEffect(() => {
@@ -140,52 +135,15 @@ const TodoApp: React.FC = () => {
         leave your device.
       </Text>
 
-      <AlertDialog
+      <ConfirmationDialog
         isOpen={isDialogOpen}
-        leastDestructiveRef={cancelRef}
         onClose={closeDeleteConfirmation}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader
-              fontSize="lg"
-              textAlign="center"
-              fontWeight="bold"
-              color={"red.500"}
-            >
-              Delete Todo
-            </AlertDialogHeader>
+        onConfirm={confirmRemoveTodo}
+        title="Delete Todo"
+        description="Are you sure you want to delete this task? This action cannot be undone."
+      />
 
-            <AlertDialogBody>
-              Are you sure you want to delete this task? This action cannot be
-              undone.
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={closeDeleteConfirmation}>
-                Cancel
-              </Button>
-              <Button colorScheme="red" onClick={confirmRemoveTodo} ml={3}>
-                Delete
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
-
-      <Box as="footer" mt={8} textAlign="center">
-        <Text fontSize="sm" color="gray.500">
-          Made with ❤️ in 🇮🇳 by{" "}
-          <Link href="https://anshulgarg.in" color="teal.500" isExternal>
-            Anshul Garg
-          </Link>
-          . Check out the code on{" "}
-          <Link href="https://github.com/anshulg8" color="teal.500" isExternal>
-            Github
-          </Link>
-          .
-        </Text>
-      </Box>
+      <Footer />
     </Container>
   );
 };
